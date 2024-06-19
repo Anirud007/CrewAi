@@ -11,6 +11,7 @@
         crossorigin="anonymous"></script>
     <title>CrewAi</title>
 </head>
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -28,50 +29,63 @@
     }
 </style>
 <body>
-    <div class="px-4 pt-5 text-center">
+    <div class="px-4 pt-3 text-center">
         <h1 class="display-3 fw-bold text-body-emphasis">Multi-Agent System using CrewAi</h1>
         <div class="col-lg-6 mx-auto">
-            <h4 class="lead px-2 fs-4 my-3">Create and manage intelligent agents effortlessly. Define goals, assign tasks,
-                and watch your AI-powered agents bring them to life.</h4>
+            <h5 class="lead px-2 fs-4 my-3">Create and manage intelligent agents effortlessly. Define goals, assign tasks,
+                and watch your AI-powered agents bring them to life.</h5    >
         </div>
     </div>
     <div class="container my-4">
         <div class="row mb-2">
             <div class="col-md-6">
-                <form action="">
+                <form method="POST" action="{{ url_for('submit') }}">
                     <h3 class="my-3 text-center">Create a New Agent</h3>
                     <div class="form-section">
                         <div class="form-group">
                             <label for="name">Name:</label>
-                            <input type="text" id="name" class="form-control">
+                            <input type="text" id="name" name="name" class="form-control" required>
                         </div>
     
                         <div class="form-group my-2">
                             <label for="backstory">Backstory:</label>
-                            <textarea id="backstory" class="form-control" rows="3"></textarea>
+                            <textarea id="backstory" name="backstory" class="form-control" rows="3" required></textarea>
                         </div>
     
                         <div class="form-group my-2">
                             <label for="goals">Goals (comma separated):</label>
-                            <input type="text" id="goals" class="form-control">
+                            <input type="text" name="goals" id="goals" class="form-control" required>
                         </div>
     
                         <div class="form-group my-2">
-                            <label for="task_description">Task Description:</label>
-                            <textarea id="task_description" class="form-control" rows="3"></textarea>
+                            <label for="task">Task Description:</label>
+                            <textarea id="task" name ="task" class="form-control" rows="3" required></textarea>
                         </div>
     
                         <div class="form-group my-2">
                             <label for="tools">Tools (comma separated):</label>
-                            <input type="text" id="tools" class="form-control">
+                            <input type="text" name="tools" id="tools" class="form-control" required>
                         </div>
     
-                        <button class="btn btn-primary my-3" onclick="createAgent()">Create Agent</button>
+                        <input class="btn btn-primary my-3" type="submit">
                 </form>
               </div>
             </div>
             <div class="col-md-6">
-                <h3 class="text-center">Agents</h3>
+                <h3 class="my-3 text-center">Agents</h3>
+                    {% for user in user_inputs %}
+                    <!-- <div class="alert alert-primary " id = "{{ user.name }}" role="alert">
+                        <strong>Name:</strong> {{ user.name }}<br>
+                        <button class="btn btn-outline-danger btn-sm" type="button">Delete</button>
+                    </div>     -->
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Agent Name : </strong> {{ user.name }}
+
+                        <!-- <form method="post">
+                            <button type="button" class="btn-close" aria-label="Close">Delete</button>
+                        </form> -->
+                      </div>
+                {% endfor %}
             </div>
           </div>
         
