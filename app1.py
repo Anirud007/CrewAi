@@ -1,24 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for
-from langchain_openai import ChatOpenAI
-from crewai import Agent, Task, Crew
-from cai import Ai_Model
+# from langchain_community.llms import Ollama
+from cai import Ai_Model, make_crew
+from langchain_community.chat_models import ChatCohere
 import os
-os.environ["OPENAI_API_KEY"] = "NA"
+os.environ["COHERE_API_KEY"] = "TI0FhwlRBI7mRdPA3uAA5UeljckrQ9auiJshNRnZ"
+llm = ChatCohere()
 
-llm = ChatOpenAI(
-    model = "crewai-llama2",
-    base_url = "http://localhost:11434/v1")
+# llm = Ollama(model="llama2")
 
 app = Flask(__name__)
 
+global answer = ""
 user_inputs = []
-
 agent_list = []
 task_list = []
 
 @app.route('/')
 def index():
-    return render_template('index.html', user_inputs=user_inputs)
+    return render_template('index.html', user_inputs=user_inputs, answer=answer)
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -43,19 +42,22 @@ def submit():
                                     'goals': goals_input,
                                     'task': task_input,
                                     'tools': tools_input})
-        automater = Ai_Model(name_input, backstory_input,goals_input,tools_input,task_input, "anything about the matter")
-        l = automater.make_agent(name_input, "task_name")
-        agent_list.append(l[0])
-        print(len(agent_list))
-        task_list.append(l[1])
-        print("Agent list is --> ", agent_list)
-        print("task list is --> ", task_list)
+        
+        automater = Ai_Model(name_input, backstory_input, goals_input, tools_input, task_input, "anything about the matter")
+        agent, task = automater.make_agent(name_input, "task_name")
+        
+        agent_list.append(agent)
+        task_list.append(task)
+
         return redirect(url_for('index'))
     
 @app.route("/crew_agents", methods=['GET', 'POST'])
 def crew_agents():
-
-    return redirect(url_for('index'))
+    if request.method == "POST":
+        crew = make_crew()
+        ans = crew.m_crew(agent_list, task_list)
+        answer = crew.run_crew(ans)
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
