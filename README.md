@@ -9,14 +9,6 @@ List any prerequisites that must be installed for the project to run, e.g., Pyth
 
 - Python 3.11
 - pip (Python package installer)
-- Ollama
-
-### Ollama Installation
-Download ollama from https://www.ollama.com  
-Install the setup and run the command
-```bash 
-ollama run llama2
-```
 
 ### Clone the Repository
 ```bash
@@ -26,8 +18,9 @@ cd CrewAi_gl
 ### Make a Virtual Environment
 ```bash 
 pip install virtualenv
-py -m venv venv
+py -3.11 -m venv venv #if you have python 3.11 installed
 ```
+
 ### Activate Virtual Environment
 ```bash 
 ./venv/Scripts/Activate.ps1 
@@ -38,5 +31,5 @@ pip install -r .\requirements.txt
 ```
 ### Run the application
 ```bash
-python app.py 
+python app1.py 
 ```
