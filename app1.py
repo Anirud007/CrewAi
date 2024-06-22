@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for
 # from langchain_community.llms import Ollama
 from cai import Ai_Model, make_crew
 from langchain_community.chat_models import ChatCohere
-from IPython.display import Markdown
 import markdown
 import os
 
