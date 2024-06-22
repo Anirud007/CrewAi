@@ -2,22 +2,26 @@ from flask import Flask, render_template, request, redirect, url_for
 # from langchain_community.llms import Ollama
 from cai import Ai_Model, make_crew
 from langchain_community.chat_models import ChatCohere
+from IPython.display import Markdown
+import markdown
 import os
+
 os.environ["COHERE_API_KEY"] = "TI0FhwlRBI7mRdPA3uAA5UeljckrQ9auiJshNRnZ"
+
 llm = ChatCohere()
 
 # llm = Ollama(model="llama2")
 
 app = Flask(__name__)
 
-global answer = ""
+answer = ""
 user_inputs = []
 agent_list = []
 task_list = []
 
 @app.route('/')
 def index():
-    return render_template('index.html', user_inputs=user_inputs, answer=answer)
+    return render_template('index.html', user_inputs=user_inputs, answer=markdown.markdown(answer))
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -51,9 +55,10 @@ def submit():
 
         return redirect(url_for('index'))
     
-@app.route("/crew_agents", methods=['GET', 'POST'])
+@app.route("/crew_agents", methods=['POST'])
 def crew_agents():
-    if request.method == "POST":
+    global answer
+    if request.method == 'POST':
         crew = make_crew()
         ans = crew.m_crew(agent_list, task_list)
         answer = crew.run_crew(ans)
