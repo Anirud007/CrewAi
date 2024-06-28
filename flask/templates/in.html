@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <title>CrewAi</title>
+    <style>
+        p {
+            display: inline;
+            margin: 0px;
+        }
+    </style>
+    <script>
+        async function fetchOutput() {
+            const response = await fetch('/outputs', {
+                method: 'GET'
+            });
+            const instances = await response.json();
+            document.getElementById("outputsList").innerHTML = `${instances}`
+        }
+        const intervalId = setInterval(fetchOutput, 2000); // Fetch every 2 seconds
+
+        async function fetchInstances() {
+            const response = await fetch('/instances');
+            const instances = await response.json();
+            const instancesList = document.getElementById('instancesList');
+            instancesList.innerHTML = '';
+
+            for (const [id, instance] of Object.entries(instances)) {
+                const instanceDiv = document.createElement('div');
+                instanceDiv.className = 'container bg-success bg-opacity-50 py-2 px-4 my-3 border border-success border-2 rounded-3 shadow';
+
+                const ins_subDiv = document.createElement('div');
+                ins_subDiv.className = 'd-flex flex-row justify-content-center';
+
+                const text_div = document.createElement('div');
+                text_div.className = 'w-100 py-1';
+
+                const Agent_name = document.createElement('strong')
+                Agent_name.textContent = 'Agent : '
+
+                const instanceText = document.createElement('p');
+                instanceText.textContent = `${instance.role}`;
+
+                const del_btn_div = document.createElement('div');
+                del_btn_div.className = 'flex-shrink-1'
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'btn btn-danger btn';
+                deleteButton.onclick = () => deleteInstance(id);
+
+                text_div.appendChild(Agent_name);
+                text_div.appendChild(instanceText);
+                del_btn_div.appendChild(deleteButton);
+                ins_subDiv.appendChild(text_div);
+                ins_subDiv.appendChild(del_btn_div);
+                instanceDiv.appendChild(ins_subDiv);
+                instancesList.appendChild(instanceDiv);
+            }
+        }
+
+
+        async function createInstance(event) {
+            event.preventDefault();
+            const role = document.getElementById('role').value;
+            const backstory = document.getElementById('backstory').value;
+            const goal = document.getElementById('goal').value;
+            const task = document.getElementById('task').value;
+            const exp_output = document.getElementById('exp_output').value;
+            const allow_delegation = document.getElementById('allow_delegation').checked;
+
+            const response = await fetch('/instances', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ role, backstory, goal, task, exp_output, allow_delegation })
+            });
+
+            if (response.ok) {
+                fetchInstances();
+                document.getElementById('instanceForm').reset();
+            } else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        }
+
+        async function deleteInstance(id) {
+            const response = await fetch(`/instances/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                fetchInstances();
+            } else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        }
+
+        async function runAgents() {
+            const response = await fetch('/run_agents', {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const output = await response.json();
+                const outputsList = document.getElementById('outputsList');
+                outputsList.innerHTML = '';
+
+                output.forEach(agentOutput => {
+                    const outputDiv = document.createElement('div');
+                    outputDiv.className = 'container-sm px-5 py-3 my-2 bg-white border border-2 rounded-3 shadow';
+                    outputDiv.textContent = agentOutput;
+                    outputsList.appendChild(outputDiv);
+                });
+            } else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', fetchInstances);
+        document.addEventListener('DOMContentLoaded', fetchOutput);
+        window.addEventListener('unload', () => clearInterval(intervalId));
+    </script>
+</head>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: rgba(251, 250, 250, 0.96);
+    }
+
+    h1 {
+
+        background-color: #8A2387;
+        background-image: linear-gradient(to right, #F27121, #E94057, #8A2387);
+        -webkit-background-clip: text;
+        /* -webkit-background-clip: text; */
+        -moz-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        -moz-text-fill-color: transparent;
+    }
+</style>
+
+<body>
+    <div class="px-4 pt-3 text-center">
+        <h1 class="display-3 fw-bold text-body-emphasis">Multi-Agent System using CrewAi</h1>
+        <div class="col-lg-6 mx-auto">
+            <h5 class="lead px-2 fs-4 my-3">Create and manage intelligent agents effortlessly. Define goals, assign
+                tasks,
+                and watch your AI-powered agents bring them to life.</h5>
+        </div>
+    </div>
+    <div class="container my-4">
+        <div class="row mb-2">
+            <div class="col-md-6">
+                <form id="instanceForm" onsubmit="createInstance(event)">
+                    <h3 class="my-3 text-center">Create a New Agent</h3>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="role">Name:</label>
+                            <input type="text" id="role" name="role" class="form-control" required>
+                        </div>
+
+                        <div class="form-group my-2">
+                            <label for="backstory">Backstory:</label>
+                            <textarea id="backstory" name="backstory" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group my-2">
+                            <label for="goal">Goals (comma separated):</label>
+                            <input type="text" name="goal" id="goal" class="form-control" required>
+                        </div>
+                        <div class="form-group my-2">
+                            <label for="task">Task Description:</label>
+                            <textarea id="task" name="task" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-group my-2">
+                            <label for="exp_output">Expected Output</label>
+                            <input type="text" name="exp_output" id="exp_output" class="form-control">
+                        </div>
+
+                        <input type="checkbox" id="allow_delegation" name="allow_delegation" value="True">
+                        <label for="allow_delegation">Allow Delegation:</label>
+                        <br>
+                        <button class="btn btn-primary my-3" type="submit">Create Agent</button>
+                </form>
+                <button class="btn btn-primary" onclick="runAgents()">Run Agents</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3 class="my-3 text-center">Agents</h3>
+            <div id="instancesList"></div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Outputs</h2>
+        <div id="outputsList" class="container-sm px-5 py-3 my-2 bg-white border border-2 rounded-3 shadow"></div>
+    </div>
+
+</body>
+
+</html>
