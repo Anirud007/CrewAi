@@ -3,10 +3,8 @@ from crewai import Agent, Task, Crew
 from langchain_cohere import ChatCohere
 # from langchain_community.chat_models import ChatCohere
 import os
-# os.environ['OPENAI_API_KEY'] = 'sk-proj-VeweXDbw16QP0pmlRYVhT3BlbkFJtKoXz641rIRYMtk4ZE9v'
-# os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 os.environ["COHERE_API_KEY"] = "TI0FhwlRBI7mRdPA3uAA5UeljckrQ9auiJshNRnZ"
-# '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'
+
 llm = ChatCohere()
 # llm = Ollama(model="llama2")
 
