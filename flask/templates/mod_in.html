@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,13 +18,36 @@
             crewDivlist.innerHTML = '';
 
             for (const [id, crw] of Object.entries(crws)) {
+
                 const instanceDiv = document.createElement('div');
                 instanceDiv.className = 'container bg-success bg-opacity-50 py-2 px-4 my-3 border border-success border-2 rounded-3 shadow';
+
+                const ins_subDiv = document.createElement('div');
+                ins_subDiv.className = 'd-flex flex-row justify-content-center';
+
+                const text_div = document.createElement('div');
+                text_div.className = 'w-100 py-2';
+
+                const Agent_name = document.createElement('strong')
+                Agent_name.textContent = 'Crew : '
 
                 const instanceText = document.createElement('p');
                 instanceText.textContent = `${crw.name}`;
 
-                instanceDiv.appendChild(instanceText);
+                const del_btn_div = document.createElement('div');
+                del_btn_div.className = 'flex-shrink-1'
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'btn btn-danger btn';
+                deleteButton.onclick = () => deleteCrew(id);
+
+                text_div.appendChild(Agent_name);
+                text_div.appendChild(instanceText);
+                del_btn_div.appendChild(deleteButton);
+                ins_subDiv.appendChild(text_div);
+                ins_subDiv.appendChild(del_btn_div);
+                instanceDiv.appendChild(ins_subDiv);
                 crewDivlist.appendChild(instanceDiv);
             }
         }
@@ -31,11 +55,11 @@
             event.preventDefault();
             const name = document.getElementById('name').value;
             response = await fetch('/crews', {
-                method : 'POST',
-                headers : {
+                method: 'POST',
+                headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({name})
+                body: JSON.stringify({ name })
             });
 
             if (response.ok) {
@@ -43,6 +67,18 @@
                 document.getElementById('crews_form').reset();
             }
             else {
+                const error = await response.json();
+                alert(error.error);
+            }
+        }
+        async function deleteCrew(id) {
+            const response = await fetch(`/crews/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                fetch_crews();
+            } else {
                 const error = await response.json();
                 alert(error.error);
             }
@@ -66,7 +102,12 @@
         -webkit-text-fill-color: transparent;
         -moz-text-fill-color: transparent;
     }
+
+    p {
+        display: inline;
+    }
 </style>
+
 <body>
     <div class="px-4 pt-3 text-center">
         <h1 class="display-3 fw-bold text-body-emphasis">Multi-Agent System using CrewAi</h1>
@@ -80,10 +121,19 @@
         <form id="crews_form" onsubmit="create_crew(event)">
             <div class="form-section">
                 <div class="form-group">
-                    <label for="name">Name:</label>
                     <div class="d-flex">
-                        <input type="text" id="name" name="name" class="form-control" required>
-                        <input type="submit" class="btn btn-primary mx-2" value="Add Crew">
+                        <div class="container">
+                            <label for="name" class="mt-2">Name:</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                            <label for="verbose" class="mt-2">Verbose:</label>
+                            <input type="number" name="verbose" id="verbose" class="form-control mx-44" required>
+                            <input type="checkbox" name="memorisation" id="memorisation" value="True" required>
+                            <label for="memorisation" class="mt-2">Memory:</label>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            <input type="submit" class="btn btn-primary px-5 my-1 py-3" value="Add Crew">
+                            <a href="{{ url_for('mod_ind') }}" class="btn btn-success my-1 py-3">GO</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,4 +142,5 @@
     <div class="container" id="crewDivlist">
     </div>
 </body>
+
 </html>

@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, render_template
 from cai import Ai_Model, make_crew
 import markdown
 app = Flask(__name__)
-print("hello")
 
 # In-memory storage for instances
 instances = {}
