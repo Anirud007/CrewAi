@@ -54,12 +54,14 @@
         async function create_crew(event) {
             event.preventDefault();
             const name = document.getElementById('name').value;
+            const verbose = document.getElementById('verbose').value;
+            const memorisation = document.getElementById('memorisation').value;
             response = await fetch('/crews', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name })
+                body: JSON.stringify({name, verbose, memorisation })
             });
 
             if (response.ok) {
@@ -127,7 +129,7 @@
                             <input type="text" id="name" name="name" class="form-control" required>
                             <label for="verbose" class="mt-2">Verbose:</label>
                             <input type="number" name="verbose" id="verbose" class="form-control mx-44" required>
-                            <input type="checkbox" name="memorisation" id="memorisation" value="True" required>
+                            <input type="checkbox" name="memorisation" id="memorisation" value="True">
                             <label for="memorisation" class="mt-2">Memory:</label>
                         </div>
                         <div class="d-flex flex-column justify-content-center">
