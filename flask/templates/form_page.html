@@ -22,43 +22,11 @@
         background-color: #8A2387;
         background-image: linear-gradient(to right, #F27121, #E94057, #8A2387);
         -webkit-background-clip: text;
-        /* -webkit-background-clip: text; */
         -moz-background-clip: text;
         -webkit-text-fill-color: transparent;
         -moz-text-fill-color: transparent;
     }
 </style>
-<!-- <script>
-    async function createInstance(event) {
-        event.preventDefault();
-        const urlParams = new URLSearchParams(window.location.search);
-        const crewId = urlParams.get('crew');
-        
-
-        const name = document.getElementById('name').value;
-        const backstory = document.getElementById('backstory').value;
-        const goals = document.getElementById('goals').value;
-        const task = document.getElementById('task').value;
-        const tools = document.getElementById('tools').value;
-
-        const response = await fetch(`/crews/${crewId}/agents`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, backstory, goals, task, tools })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            alert(`Agent ${data.name} added to the crew`);
-            document.getElementById('instanceForm').reset();
-        } else {
-            const error = await response.json();
-            alert(error.error);
-        }
-    }
-</script> -->
 
 <body>
     <div class="px-4 pt-3 text-center">
