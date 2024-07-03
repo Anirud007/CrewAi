@@ -86,8 +86,8 @@ def create_instance(crew_id):
             goals = request.form.get('goals')
             task = request.form.get('task')
             tools = request.form.get('tools')
-            # exp_output = request.form.get('exp_output')
-            # allow_delegation = request.form.get('allow_delegation')
+            exp_output = request.form.get('exp_output')
+            allow_delegation = request.form.get('allow_delegation')
             
             # if bool(allow_delegation) != True:
             #     allow_delegation = False
