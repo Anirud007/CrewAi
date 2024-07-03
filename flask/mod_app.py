@@ -1,13 +1,18 @@
 from flask import Flask, render_template, url_for, redirect, jsonify, request
+from cai import Ai_Model, make_crew
 
 app = Flask(__name__)
 
 crew_list = {}
 agents = {}
+
+f_list = {}
+outputs = {}
+
 crew_counter = 0
 agent_counter = 0
 
-# Frontend routers
+# Frontend endpoints
 @app.route('/')
 def index():
     return render_template('mod_in.html')
@@ -44,7 +49,7 @@ def make_crew():
         crew_name = content.get('name')
         verbose = content.get('verbose')
         memorisation = content.get('memorisation')
-        full_id = 'crew'+str(crew_counter)
+        full_id = 'crew' + str(crew_counter)
 
         if bool(memorisation) == True:
             memorisation = True
@@ -72,13 +77,11 @@ def delete_instance(crew_id):
     return jsonify({"message": "Crew deleted"}), 200
 
 # Agents routes
-
 @app.route('/crews/<crew_id>/agents', methods=['POST'])
 def create_instance(crew_id):
     global agent_counter
-
+    global f_list
     try:
-        # content = request.get_json()
         if request.method == 'POST':
 
             role = request.form.get('name')
@@ -89,23 +92,32 @@ def create_instance(crew_id):
             exp_output = request.form.get('exp_output')
             allow_delegation = request.form.get('allow_delegation')
             
-            # if bool(allow_delegation) != True:
-            #     allow_delegation = False
-            # else:
-            #     allow_delegation = True
+            if bool(allow_delegation) != True:
+                allow_delegation = False
+            else:
+                allow_delegation = True
+
+            if bool(tools) != True:
+                tools = False
+            else:
+                tools = True
 
             full_id = 'agent'+ str(agent_counter)
             task_id = 'task' + str(agent_counter)
 
-            # automater = Ai_Model(role, backstory, goal, task, exp_output, allow_delegation)
-            # agent, tasks = automater.make_agent(full_id, task_id)
+            automater = Ai_Model(role, backstory, goals, task, exp_output, allow_delegation, outputs)
+            agent, tasks = automater.make_agent(full_id, task_id)
             
-            # agent_list.append(agent)
-            # task_list.append(tasks)
-            # print(agent_list,'\n',task_list)
+            if crew_id not in f_list:
+                f_list[crew_id] = {
+                    "crew_agents" : [agent],
+                    "crew_tasks" : [tasks]
+                }
+            else:
+                f_list[crew_id]["crew_agents"].append(agent)
+                f_list[crew_id]["crew_tasks"].append(tasks)
 
-            # "exp_output": exp_output,
-            # "allow_delegation" : allow_delegation
+            print("\n\n\n", f_list, "\n\n\n")
 
             agents[full_id] = {
                 "id": full_id,
@@ -113,7 +125,9 @@ def create_instance(crew_id):
                 "backstory": backstory,
                 "goals": goals,
                 "task": task,
-                "tools": tools
+                "exp_output": exp_output,
+                "tools": tools,
+                "allow_delegation" : allow_delegation
             }
             agent_counter+=1
 
@@ -124,6 +138,22 @@ def create_instance(crew_id):
         return jsonify({"error" : f"{e}"}), 400
 
     return redirect(url_for('mod_ind'))
+
+
+# output endpoint
+@app.route("/crews/<crew_id>/output", methods=['GET', 'POST'])
+def outputs(crew_id):
+    global outputs
+    global f_list
+    try:
+        if request.method == 'POST':
+            crew = make_crew()
+            ans = crew.m_crew(f_list[crew_id]["crew_agents"], f_list[crew_id]["crew_agents"])
+            answer = crew.run_crew(ans)
+            return jsonify(outputs)
+    except Exception as e:
+        return jsonify({"Error": f"{e}"})
+    return jsonify({"Error" : "Cannot run Crew"})
     
 if __name__ == '__main__':
     app.run(debug=True)

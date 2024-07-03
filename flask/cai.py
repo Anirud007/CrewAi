@@ -8,20 +8,22 @@ llm = ChatCohere()
 # llm = Ollama(model="llama2")
 
 class Ai_Model:
-    def __init__(self, name, backstory, goals, task, exp_output, allow_delegation):
+    def __init__(self, name, backstory, goals, task, exp_output, allow_delegation, res):
         self.name = name
         self.backstory = backstory
         self.goals = goals
         self.task = task
         self.exp_output = exp_output
         self.allow_delegation = allow_delegation
-        self.res = {}
+        self.res = res
 
-    def callback_function(self, output):
-        self.res[self.name] = f"{output.raw_output}"
-        return self.res   
 
     def make_agent(self, agent_name, agent_task):
+        
+        def callback_function(self, output):
+            self.res[self.name] = f"{output.raw_output}"
+            return self.res   
+        
         agent_name = Agent(role = self.name, 
                            goal = self.goals,
                            backstory = self.backstory,
