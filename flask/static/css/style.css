@@ -1,0 +1,19 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgba(251, 250, 250, 0.96);
+}
+
+h1 {
+
+    background-color: #8A2387;
+    background-image: linear-gradient(to right, #F27121, #E94057, #8A2387);
+    -webkit-background-clip: text;
+    /* -webkit-background-clip: text; */
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+
+p {
+    display: inline;
+}

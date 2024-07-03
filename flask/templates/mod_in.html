@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -11,104 +12,7 @@
         crossorigin="anonymous"></script>
     <script src="../static/js/mod_in.js"></script>
     <title>CrewAi</title>
-        async function fetch_crews() {
-            const response = await fetch('/crews');
-            const crws = await response.json();
-            const crewDivlist = document.getElementById('crewDivlist');
-            crewDivlist.innerHTML = '';
-
-            for (const [id, crw] of Object.entries(crws)) {
-
-                const instanceDiv = document.createElement('div');
-                instanceDiv.className = 'container bg-success bg-opacity-50 py-2 px-4 my-3 border border-success border-2 rounded-3 shadow';
-
-                const ins_subDiv = document.createElement('div');
-                ins_subDiv.className = 'd-flex flex-row justify-content-center';
-
-                const text_div = document.createElement('div');
-                text_div.className = 'w-100 py-2';
-
-                const Agent_name = document.createElement('strong')
-                Agent_name.textContent = 'Crew : '
-
-                const instanceText = document.createElement('p');
-                instanceText.textContent = `${crw.name}`;
-
-                const del_btn_div = document.createElement('div');
-                del_btn_div.className = 'flex-shrink-1'
-
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.className = 'btn btn-danger btn';
-                deleteButton.onclick = () => deleteCrew(id);
-
-                text_div.appendChild(Agent_name);
-                text_div.appendChild(instanceText);
-                del_btn_div.appendChild(deleteButton);
-                ins_subDiv.appendChild(text_div);
-                ins_subDiv.appendChild(del_btn_div);
-                instanceDiv.appendChild(ins_subDiv);
-                crewDivlist.appendChild(instanceDiv);
-            }
-        }
-        async function create_crew(event) {
-            event.preventDefault();
-            const name = document.getElementById('name').value;
-            const verbose = document.getElementById('verbose').value;
-            const memorisation = document.getElementById('memorisation').value;
-            response = await fetch('/crews', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({name, verbose, memorisation })
-            });
-
-            if (response.ok) {
-                fetch_crews();
-                document.getElementById('crews_form').reset();
-            }
-            else {
-                const error = await response.json();
-                alert(error.error);
-            }
-        }
-        async function deleteCrew(id) {
-            const response = await fetch(`/crews/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                fetch_crews();
-            } else {
-                const error = await response.json();
-                alert(error.error);
-            }
-        }
-        document.addEventListener('DOMContentLoaded', fetch_crews);
-    </script> -->
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: rgba(251, 250, 250, 0.96);
-    }
-
-    h1 {
-
-        background-color: #8A2387;
-        background-image: linear-gradient(to right, #F27121, #E94057, #8A2387);
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        -moz-text-fill-color: transparent;
-    }
-
-    p {
-        display: inline;
-    }
-</style>
-
 <body>
     <div class="px-4 pt-3 text-center">
         <h1 class="display-3 fw-bold text-body-emphasis">Multi-Agent System using CrewAi</h1>
