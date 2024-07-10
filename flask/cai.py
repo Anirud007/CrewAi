@@ -7,6 +7,7 @@ os.environ["COHERE_API_KEY"] = "TI0FhwlRBI7mRdPA3uAA5UeljckrQ9auiJshNRnZ"
 llm = ChatCohere()
 # llm = Ollama(model="llama2")
 
+
 class Ai_Model:
     def __init__(self, name, backstory, goals, task, exp_output, allow_delegation, res):
         self.name = name
@@ -17,13 +18,12 @@ class Ai_Model:
         self.allow_delegation = allow_delegation
         self.res = res
 
+    def callback_function(self, output):
+        self.res[self.name] = f"{output.raw_output}"
+        return self.res   
 
     def make_agent(self, agent_name, agent_task):
-        
-        def callback_function(self, output):
-            self.res[self.name] = f"{output.raw_output}"
-            return self.res   
-        
+
         agent_name = Agent(role = self.name, 
                            goal = self.goals,
                            backstory = self.backstory,
@@ -34,18 +34,20 @@ class Ai_Model:
         agent_task = Task(description = self.task,
                           agent = agent_name,
                           expected_output = self.exp_output,
-                          callback = callback_function)
+                          callback = self.callback_function)
         
         return [agent_name, agent_task]
 
-class make_crew:
-    def m_crew(self, name_l, task_l):
-        c = Crew(agents = name_l,
-                 tasks = task_l,
+class Makecrew:
+    def __init__(self, name_l, task_l):
+        self.name_l = name_l
+        self.task_l = task_l
+
+    def run_model(self):
+        c = Crew(agents = self.name_l,
+                 tasks = self.task_l,
                  process = Process.sequential)
-        return c
-    
-    def run_crew(self, c):
+
         result = c.kickoff()
         return result
 

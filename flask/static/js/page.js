@@ -29,11 +29,15 @@ async function fetch_crews() {
         addButton.className = 'btn btn-primary my-1';
         addButton.href = `/page/${id}/add_agent`;
 
-        
+        const runbtn = document.createElement('a');
+        runbtn.textContent = 'Run Crew';
+        runbtn.className = 'btn btn-primary mx-1 my-1';
+        runbtn.href = `/crews/${id}/output`
         
         text_div.appendChild(Agent_name);
         text_div.appendChild(instanceText);
         del_btn_div.appendChild(addButton);
+        del_btn_div.appendChild(runbtn);
         ins_subDiv.appendChild(text_div);
         ins_subDiv.appendChild(del_btn_div);
         instanceDiv.appendChild(ins_subDiv);

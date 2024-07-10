@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, redirect, jsonify, request
-from cai import Ai_Model, make_crew
+from cai import Ai_Model, Makecrew
+import markdown
 
 app = Flask(__name__)
 
@@ -25,6 +26,10 @@ def mod_ind():
 @app.route('/page/<crew_id>/add_agent')
 def add_agent(crew_id):
     return render_template('form_page.html', crew_id=crew_id)
+
+@app.route("/crews/<crew_id>/showoutput", methods=['GET', 'POST'])
+def show_results(crew_id):
+    return render_template("output.html", output = outputs )
 
 # Crew endpoints
 @app.route('/crews', methods = ['GET'])
@@ -118,6 +123,7 @@ def create_instance(crew_id):
                 f_list[crew_id]["crew_tasks"].append(tasks)
 
             print("\n\n\n", f_list, "\n\n\n")
+            print("\n\n\n",f_list[crew_id]["crew_agents"],"\n\n\n")
 
             agents[full_id] = {
                 "id": full_id,
@@ -131,7 +137,7 @@ def create_instance(crew_id):
             }
             agent_counter+=1
 
-            if crew_id not in crew_list:
+            if str(crew_id) not in crew_list:
                 return jsonify({"Error" : "Crew Not Found"}) , 404
             crew_list[crew_id]["agents"].append(agents[full_id])
     except Exception as e:
@@ -141,19 +147,40 @@ def create_instance(crew_id):
 
 
 # output endpoint
+# @app.route("/crews/<crew_id>/output", methods=['GET', 'POST'])
+# def outputs(crew_id):
+#     global outputs
+#     global f_list
+#     try:
+#         crews = make_crew()
+#         ans = crews.run_model(f_list[crew_id]["crew_agents"], f_list[crew_id]["crew_tasks"])
+#         return jsonify(outputs)
+#     except Exception as e:
+#         return jsonify({"Error": f"{e}"}), 400
+#     return jsonify({"Error" : "Cannot run Crew"})
+
 @app.route("/crews/<crew_id>/output", methods=['GET', 'POST'])
-def outputs(crew_id):
+def crew_output(crew_id):
     global outputs
     global f_list
     try:
-        if request.method == 'POST':
-            crew = make_crew()
-            ans = crew.m_crew(f_list[crew_id]["crew_agents"], f_list[crew_id]["crew_agents"])
-            answer = crew.run_crew(ans)
-            return jsonify(outputs)
+        crews_instance = Makecrew(f_list[crew_id]["crew_agents"], f_list[crew_id]["crew_tasks"])  
+        if crew_id not in f_list:
+            return jsonify({"Error": "Crew Not Found"}), 404
+        
+        if len(f_list[crew_id]["crew_agents"]) != len(outputs):
+            result = crews_instance.run_model()
+            for i in outputs:
+                outputs[i] = markdown.markdown(outputs[i])
+        else:
+            return redirect(url_for('show_results', crew_id=crew_id))
+        
+        return redirect(url_for('show_results', crew_id=crew_id))
+
     except Exception as e:
-        return jsonify({"Error": f"{e}"})
-    return jsonify({"Error" : "Cannot run Crew"})
+        return jsonify({"Error": str(e)}), 400
+    
+    return jsonify({"Error": "Cannot run Crew"})      
     
 if __name__ == '__main__':
     app.run(debug=True)
