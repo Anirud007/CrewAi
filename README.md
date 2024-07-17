@@ -21,6 +21,11 @@ pip install virtualenv
 py -3.11 -m venv venv #if you have python 3.11 installed
 ```
 
+### Make a .env file for loading api keys
+```bash 
+echo > .env # add all api keys in this file example GROQ_API_KEY = 123
+```
+
 ### Activate Virtual Environment
 ```bash 
 ./venv/Scripts/Activate.ps1 
@@ -31,5 +36,5 @@ pip install -r .\requirements.txt
 ```
 ### Run the application
 ```bash
-python app1.py 
+python app.py 
 ```
